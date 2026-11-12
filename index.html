@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Timer</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='22' fill='%233b7cf6'/%3E%3Cpath d='M50 22v30l20 12' stroke='white' stroke-width='9' fill='none' stroke-linecap='round'/%3E%3C/svg%3E">
+<style>
+  :root{
+    --bg:#f4f6f9;
+    --panel:#ffffff;
+    --line:#e4e8ee;
+    --line-soft:#f0f3f7;
+    --text:#12161c;
+    --muted:#7b8595;
+    --accent:#3b7cf6;
+    --best:#0e9f6e;
+  }
+  *{box-sizing:border-box}
+  html,body{height:100%}
+  body{
+    margin:0;
+    display:flex;
+    overflow:hidden;
+    background:var(--bg);
+    color:var(--text);
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    -webkit-user-select:none;user-select:none;
+    -webkit-tap-highlight-color:transparent;
+    -webkit-touch-callout:none;
+    touch-action:manipulation;
+  }
+
+  /* ---------- sidebar ---------- */
+  .panel{
+    flex:0 0 320px;
+    width:320px;
+    height:100%;
+    display:flex;
+    flex-direction:column;
+    background:var(--panel);
+    border-right:1px solid var(--line);
+    z-index:2;
+  }
+  .brand{
+    display:flex;align-items:center;gap:9px;
+    padding:22px 20px 18px;
+    font-size:15px;font-weight:650;letter-spacing:.09em;text-transform:uppercase;
+  }
+  .brand .dot{width:9px;height:9px;border-radius:50%;background:var(--accent);box-shadow:0 0 0 4px rgba(59,124,246,.14)}
+
+  .stats-wrap{padding:0 20px 18px}
+  .stat{
+    display:flex;align-items:baseline;justify-content:space-between;gap:12px;
+    padding:10px 0;
+    border-bottom:1px solid var(--line-soft);
+  }
+  .stat .label{font-size:12.5px;color:var(--muted);letter-spacing:.01em}
+  .stat .value{
+    font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+    font-size:15px;font-weight:600;font-variant-numeric:tabular-nums;
+  }
+  .stat .value.best{color:var(--best)}
+
+  .times-head{
+    display:flex;align-items:center;justify-content:space-between;
+    padding:0 20px 9px;
+    font-size:11px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);
+  }
+  .count{
+    font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+    letter-spacing:0;color:var(--muted);background:var(--bg);
+    border-radius:20px;padding:2px 8px;font-size:11px;
+  }
+
+  .times{
+    list-style:none;margin:0;padding:0 0 8px;
+    flex:1;overflow-y:auto;overscroll-behavior:contain;
+    border-top:1px solid var(--line);
+  }
+  .times li{
+    display:grid;grid-template-columns:42px 1fr;align-items:center;
+    padding:8px 20px;
+    border-bottom:1px solid var(--line-soft);
+    font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+    font-variant-numeric:tabular-nums;
+  }
+  .times li .idx{font-size:11.5px;color:var(--muted)}
+  .times li .val{font-size:14.5px;font-weight:500;letter-spacing:.01em}
+  .times li.best .val{color:var(--best);font-weight:650}
+  .times li.best .idx{color:var(--best)}
+  .times li.empty{
+    display:block;padding:22px 20px;border:0;
+    font-family:inherit;font-size:12.5px;line-height:1.6;color:var(--muted);
+  }
+  .times::-webkit-scrollbar{width:10px}
+  .times::-webkit-scrollbar-thumb{background:#d9dfe7;border-radius:10px;border:3px solid #fff}
+
+  .panel-foot{padding:12px 20px 16px;border-top:1px solid var(--line)}
+  .clear{
+    width:100%;
+    padding:9px 12px;
+    font:inherit;font-size:12.5px;font-weight:550;
+    color:#5a6474;background:#fff;
+    border:1px solid var(--line);border-radius:9px;
+    cursor:pointer;transition:background .15s,border-color .15s,color .15s;
+  }
+  .clear:hover{background:#f7f9fc;border-color:#cfd7e3;color:#1d2634}
+  .clear:active{transform:translateY(1px)}
+
+  /* ---------- timer stage ---------- */
+  .stage{
+    position:relative;flex:1;
+    display:flex;flex-direction:column;align-items:center;justify-content:center;
+    background:radial-gradient(120% 90% at 50% 35%,#ffffff 0%,var(--bg) 62%);
+    padding:24px;
+  }
+  .timer{
+    font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,"Liberation Mono",monospace;
+    font-variant-numeric:tabular-nums;
+    font-size:clamp(58px,11.5vw,142px);
+    font-weight:250;
+    line-height:1;
+    letter-spacing:-.035em;
+    color:var(--text);
+    transition:color .18s ease;
+  }
+  .stage.holding .timer{color:var(--accent)}
+  .timer.flash{animation:flash .62s steps(1,end) infinite}
+  @keyframes flash{0%,49%{opacity:1}50%,100%{opacity:.12}}
+
+  .hint{
+    margin-top:22px;
+    font-size:13px;color:var(--muted);letter-spacing:.01em;
+    transition:opacity .2s ease;
+  }
+  .hint kbd{
+    font-family:inherit;font-size:12px;font-weight:600;
+    color:#4a5567;background:#fff;
+    border:1px solid var(--line);border-bottom-width:2px;
+    border-radius:6px;padding:2px 7px;margin:0 2px;
+  }
+
+  @media (max-width:820px){
+    body{flex-direction:column}
+    .stage{flex:0 0 46vh;padding:18px}
+    .panel{
+      flex:1 1 auto;width:100%;height:auto;min-height:0;
+      border-right:0;border-top:1px solid var(--line);
+    }
+    .brand{padding:16px 18px 12px}
+    .stats-wrap{padding:0 18px 14px;display:grid;grid-template-columns:1fr 1fr 1fr;gap:0 14px}
+    .stat{flex-direction:column;align-items:flex-start;gap:3px;padding:6px 0;border-bottom:0}
+    .stat .label{font-size:11px}
+    .stat .value{font-size:14px}
+    .times-head{padding:0 18px 8px}
+    .times li{padding:7px 18px;grid-template-columns:36px 1fr}
+    .panel-foot{padding:10px 18px 12px}
+  }
+</style>
+</head>
+<body>
+
+<aside class="panel">
+  <div class="brand"><span class="dot"></span>Timer</div>
+
+  <div class="stats-wrap">
+    <div class="stat">
+      <span class="label">Average of 5</span>
+      <span class="value" id="ao5">—</span>
+    </div>
+    <div class="stat">
+      <span class="label">Average of 12</span>
+      <span class="value" id="ao12">—</span>
+    </div>
+    <div class="stat">
+      <span class="label">Best time</span>
+      <span class="value best" id="best">—</span>
+    </div>
+  </div>
+
+  <div class="times-head">
+    <span>Times</span>
+    <span class="count" id="count">0</span>
+  </div>
+  <ol class="times" id="times"></ol>
+
+  <div class="panel-foot">
+    <button class="clear" id="clear" type="button">Clear times</button>
+  </div>
+</aside>
+
+<main class="stage" id="stage">
+  <div class="timer" id="timer">0.000</div>
+  <div class="hint" id="hint">Hold <kbd>space</kbd> &nbsp;·&nbsp; release to start</div>
+</main>
+
+<script>
+(function () {
+  "use strict";
+
+  var STORE = "hold-timer.solves.v1";
+  var timerEl = document.getElementById("timer");
+  var hintEl  = document.getElementById("hint");
+  var listEl  = document.getElementById("times");
+  var countEl = document.getElementById("count");
+  var stage   = document.getElementById("stage");
+  var ao5El   = document.getElementById("ao5");
+  var ao12El  = document.getElementById("ao12");
+  var bestEl  = document.getElementById("best");
+
+  var solves = load();
+  var phase = "idle";          // idle | holding | running | stopped
+  var startAt = 0;
+  var rafId = 0;
+
+  /* ---------- helpers ---------- */
+  function load() {
+    try {
+      var raw = JSON.parse(localStorage.getItem(STORE));
+      if (Array.isArray(raw)) {
+        return raw.filter(function (t) { return typeof t === "number" && isFinite(t) && t >= 0; });
+      }
+    } catch (e) {}
+    return [];
+  }
+  function save() {
+    try { localStorage.setItem(STORE, JSON.stringify(solves)); } catch (e) {}
+  }
+  function fmt(ms) {
+    if (ms === null || ms === undefined) return "—";
+    var t = Math.max(0, ms);
+    if (t < 60000) return (t / 1000).toFixed(3);
+    var m = Math.floor(t / 60000);
+    var s = (t % 60000) / 1000;
+    return m + ":" + s.toFixed(3).padStart(6, "0");
+  }
+  function averageOf(n) {
+    if (solves.length < n) return null;
+    var sorted = solves.slice(-n).sort(function (a, b) { return a - b; });
+    var kept = n >= 3 ? sorted.slice(1, -1) : sorted;
+    var sum = kept.reduce(function (a, b) { return a + b; }, 0);
+    return sum / kept.length;
+  }
+  function bestTime() {
+    if (!solves.length) return null;
+    return solves.reduce(function (a, b) { return b < a ? b : a; });
+  }
+
+  /* ---------- rendering ---------- */
+  function render() {
+    var best = bestTime();
+    ao5El.textContent = fmt(averageOf(5));
+    ao12El.textContent = fmt(averageOf(12));
+    bestEl.textContent = fmt(best);
+    countEl.textContent = String(solves.length);
+
+    if (!solves.length) {
+      listEl.innerHTML = '<li class="empty">No times yet.<br>Hold <b>space</b>, release, then press any key to stop.</li>';
+      return;
+    }
+
+    var html = "";
+    for (var i = solves.length - 1; i >= 0; i--) {
+      var isBest = solves[i] === best;
+      html += '<li' + (isBest ? ' class="best"' : '') + '>' +
+                '<span class="idx">' + (i + 1) + '</span>' +
+                '<span class="val">' + fmt(solves[i]) + '</span>' +
+              '</li>';
+    }
+    listEl.innerHTML = html;
+    listEl.scrollTop = 0;
+  }
+
+  /* ---------- timer state machine ---------- */
+  function canHold() { return phase === "idle" || phase === "stopped"; }
+
+  function beginHold() {
+    if (!canHold()) return;
+    phase = "holding";
+    cancelAnimationFrame(rafId);
+    timerEl.textContent = "00";
+    timerEl.classList.add("flash");
+    stage.classList.add("holding");
+    hintEl.textContent = "Release to start";
+  }
+
+  function cancelHold() {
+    if (phase !== "holding") return;
+    phase = solves.length ? "stopped" : "idle";
+    timerEl.classList.remove("flash");
+    stage.classList.remove("holding");
+    timerEl.textContent = solves.length ? fmt(solves[solves.length - 1]) : "0.000";
+    hintEl.innerHTML = 'Hold <kbd>space</kbd> &nbsp;·&nbsp; release to start';
+  }
+
+  function beginRun() {
+    if (phase !== "holding") return;
+    phase = "running";
+    timerEl.classList.remove("flash");
+    stage.classList.remove("holding");
+    timerEl.textContent = "0.000";
+    hintEl.textContent = "Press any key to stop";
+    startAt = performance.now();
+    rafId = requestAnimationFrame(tick);
+  }
+
+  function tick() {
+    timerEl.textContent = fmt(performance.now() - startAt);
+    if (phase === "running") rafId = requestAnimationFrame(tick);
+  }
+
+  function stopRun() {
+    if (phase !== "running") return;
+    var elapsed = performance.now() - startAt;
+    cancelAnimationFrame(rafId);
+    phase = "stopped";
+    timerEl.textContent = fmt(elapsed);
+    solves.push(Math.round(elapsed));
+    save();
+    render();
+    hintEl.innerHTML = 'Hold <kbd>space</kbd> to go again';
+  }
+
+  /* ---------- keyboard ---------- */
+  function isSpace(e) { return e.code === "Space" || e.key === " " || e.key === "Spacebar"; }
+
+  window.addEventListener("keydown", function (e) {
+    if (e.metaKey && !isSpace(e)) return;      // leave OS shortcuts alone
+    if (isSpace(e)) {
+      e.preventDefault();
+      if (e.repeat) return;
+      if (phase === "running") { stopRun(); return; }
+      beginHold();
+      return;
+    }
+    if (phase === "running" && !e.repeat) stopRun();
+  }, { passive: false });
+
+  window.addEventListener("keyup", function (e) {
+    if (isSpace(e) && phase === "holding") {
+      e.preventDefault();
+      beginRun();
+    }
+  }, { passive: false });
+
+  /* ---------- pointer (touch / mouse) ---------- */
+  stage.addEventListener("pointerdown", function (e) {
+    if (e.pointerType === "mouse" && e.button !== 0) return;
+    e.preventDefault();
+    if (phase === "running") { stopRun(); return; }
+    beginHold();
+  });
+
+  window.addEventListener("pointerup", function () {
+    if (phase === "holding") beginRun();
+  });
+
+  window.addEventListener("pointercancel", cancelHold);
+  window.addEventListener("blur", cancelHold);
+
+  document.addEventListener("contextmenu", function (e) {
+    if (stage.contains(e.target)) e.preventDefault();
+  });
+
+  /* ---------- clear ---------- */
+  document.getElementById("clear").addEventListener("click", function () {
+    if (!solves.length) return;
+    if (window.confirm("Clear all " + solves.length + " recorded times?")) {
+      solves = [];
+      save();
+      render();
+      if (phase === "stopped") {
+        phase = "idle";
+        timerEl.textContent = "0.000";
+        hintEl.innerHTML = 'Hold <kbd>space</kbd> &nbsp;·&nbsp; release to start';
+      }
+    }
+  });
+
+  render();
+})();
+</script>
+</body>
+</html>
