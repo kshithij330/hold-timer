@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Contact · Timer</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='22' fill='%233b7cf6'/%3E%3Cpath d='M50 22v30l20 12' stroke='white' stroke-width='9' fill='none' stroke-linecap='round'/%3E%3C/svg%3E">
+<style>
+  :root{
+    --bg:#f4f6f9;
+    --panel:#ffffff;
+    --line:#e4e8ee;
+    --line-soft:#f0f3f7;
+    --text:#12161c;
+    --muted:#7b8595;
+    --accent:#3b7cf6;
+  }
+  *{box-sizing:border-box}
+  body{
+    margin:0;
+    background:var(--bg);
+    color:var(--text);
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    line-height:1.6;
+    -webkit-font-smoothing:antialiased;
+  }
+  .wrap{max-width:760px;margin:0 auto;padding:32px 20px 64px}
+
+  header{
+    display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;
+    padding-bottom:18px;border-bottom:1px solid var(--line);
+  }
+  .brand{
+    display:flex;align-items:center;gap:9px;
+    font-size:13px;font-weight:650;letter-spacing:.09em;text-transform:uppercase;
+    color:inherit;text-decoration:none;
+  }
+  .brand .dot{width:9px;height:9px;border-radius:50%;background:var(--accent);box-shadow:0 0 0 4px rgba(59,124,246,.14)}
+  .nav{display:flex;gap:4px;flex-wrap:wrap;font-size:13px}
+  .nav a{color:#5c6675;text-decoration:none;padding:6px 10px;border-radius:8px}
+  .nav a:hover{background:#eaeef4;color:var(--text)}
+  .nav a[aria-current="page"]{background:#fff;color:var(--accent);font-weight:600;box-shadow:inset 0 0 0 1px var(--line)}
+
+  h1{font-size:26px;line-height:1.25;letter-spacing:-.01em;margin:30px 0 8px}
+  .lede{margin:0 0 26px;color:var(--muted);font-size:15px;max-width:58ch}
+
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:20px 22px;margin:0 0 16px}
+  .card h2{
+    font-size:11.5px;letter-spacing:.1em;text-transform:uppercase;
+    color:var(--muted);margin:0 0 12px;font-weight:600;
+  }
+  .card p{margin:0 0 10px;font-size:14px;color:#4b5563}
+  .card p:last-child{margin-bottom:0}
+
+  .row{
+    display:block;text-decoration:none;color:inherit;
+    padding:14px 0;border-bottom:1px solid var(--line-soft);
+  }
+  .row:last-child{border-bottom:0;padding-bottom:0}
+  .row:first-child{padding-top:0}
+  .row-title{display:block;font-size:14.5px;font-weight:600}
+  .row:hover .row-title{color:var(--accent)}
+  .row-meta{display:block;margin-top:2px;font-size:12px;color:var(--muted);word-break:break-all}
+  .row-desc{display:block;margin-top:5px;font-size:13.5px;color:#5c6675}
+
+  ul{margin:0;padding-left:18px}
+  li{font-size:14px;color:#4b5563;margin:6px 0}
+  li strong{color:var(--text);font-weight:600}
+
+  code{
+    font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:12.5px;
+    background:var(--bg);border:1px solid var(--line);border-radius:6px;padding:1px 6px;
+  }
+
+  footer{
+    margin-top:34px;padding-top:16px;border-top:1px solid var(--line);
+    font-size:12.5px;color:var(--muted);
+  }
+  footer a{color:var(--accent);text-decoration:none}
+  footer a:hover{text-decoration:underline}
+
+  @media (max-width:560px){
+    .wrap{padding:24px 16px 48px}
+    h1{font-size:22px;margin-top:24px}
+    header{gap:12px}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header>
+    <a class="brand" href="index.html"><span class="dot"></span>Timer App of Kshithij</a>
+    <nav class="nav" aria-label="Primary">
+      <a href="index.html">Timer</a>
+      <a href="guide.html">Guide</a>
+      <a href="links.html">Links</a>
+      <a href="contact.html" aria-current="page">Contact</a>
+    </nav>
+  </header>
+
+  <h1>Contact</h1>
+  <p class="lede">This is a small side project, so the fastest route depends on what you are bringing: a bug, an idea, or a question.</p>
+
+  <div class="card">
+    <h2>Where to write</h2>
+    <a class="row" href="https://github.com/kshithij330/hold-timer/issues/new">
+      <span class="row-title">Open an issue</span>
+      <span class="row-meta">github.com/kshithij330/hold-timer/issues</span>
+      <span class="row-desc">Best for bugs and feature requests — the discussion stays public and searchable.</span>
+    </a>
+    <a class="row" href="mailto:kshithij330@users.noreply.github.com">
+      <span class="row-title">Email</span>
+      <span class="row-meta">kshithij330@users.noreply.github.com</span>
+      <span class="row-desc">For anything that does not belong in a public thread.</span>
+    </a>
+    <a class="row" href="https://github.com/kshithij330">
+      <span class="row-title">GitHub profile</span>
+      <span class="row-meta">github.com/kshithij330</span>
+      <span class="row-desc">See what else is being built.</span>
+    </a>
+  </div>
+
+  <div class="card">
+    <h2>What to include</h2>
+    <p>A report without these details usually means a round trip of questions before anything can happen:</p>
+    <ul>
+      <li><strong>Browser and OS</strong> — for example Safari on iOS 18, or Chrome on Windows 11.</li>
+      <li><strong>What you did</strong> — hold, release, stop; which key or tap.</li>
+      <li><strong>What you expected</strong> and <strong>what actually happened</strong>.</li>
+      <li><strong>Your times, if they matter</strong> — the list is stored locally, so it is not visible from the outside.</li>
+    </ul>
+  </div>
+
+  <div class="card">
+    <h2>About replies</h2>
+    <p>This is maintained in spare time, so expect a few days rather than a few minutes. Issues that include a clear reproduction usually get answered first.</p>
+    <p>Security concerns should go by email rather than into a public issue.</p>
+  </div>
+
+  <footer>
+    Timer App of Kshithij · <a href="index.html">Back to the timer</a>
+  </footer>
+
+</div>
+</body>
+</html>
