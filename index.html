@@ -225,6 +225,19 @@
   .timer.flash{animation:flash .62s steps(1,end) infinite}
   @keyframes flash{0%,49%{opacity:1}50%,100%{opacity:.12}}
 
+  .mean-row{
+    display:flex;align-items:baseline;gap:9px;
+    margin-top:14px;
+  }
+  .mean-label{
+    font-size:11px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);
+  }
+  .mean-value{
+    font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+    font-variant-numeric:tabular-nums;
+    font-size:18px;font-weight:550;letter-spacing:-.01em;color:#3d4655;
+  }
+
   .hint{
     margin-top:22px;
     font-size:13px;color:var(--muted);letter-spacing:.01em;
@@ -326,6 +339,10 @@
 <main class="stage" id="stage">
   
   <div class="timer" id="timer">0.000</div>
+  <div class="mean-row">
+    <span class="mean-label">Average</span>
+    <span class="mean-value" id="mean">—</span>
+  </div>
   <div class="hint" id="hint">Hold <kbd>space</kbd> &nbsp;·&nbsp; release to start</div>
 </main>
 
@@ -367,6 +384,10 @@
   var listEl  = document.getElementById("times");
   var countEl = document.getElementById("count");
   var stage   = document.getElementById("stage");
+  var ao5El   = document.getElementById("ao5");
+  var ao12El  = document.getElementById("ao12");
+  var bestEl  = document.getElementById("best");
+  var meanEl  = document.getElementById("mean");
   var statsEl = document.getElementById("stats");
 
   var sessions = load();
@@ -453,10 +474,19 @@
     if (!solves.length) return null;
     return solves.reduce(function (a, b) { return b < a ? b : a; });
   }
+  function meanTime() {
+    if (!solves.length) return null;
+    var sum = solves.reduce(function (a, b) { return a + b; }, 0);
+    return sum / solves.length;
+  }
 
   /* ---------- rendering ---------- */
   function render() {
     var best = bestTime();
+    ao5El.textContent = fmt(averageOf(5));
+    ao12El.textContent = fmt(averageOf(12));
+    bestEl.textContent = fmt(best);
+    meanEl.textContent = fmt(meanTime());
     var stats = "";
     for (var i = 0; i < avgs.length; i++) {
       stats += '<div class="stat"><span class="label">Average of ' + avgs[i] + '</span>' +
