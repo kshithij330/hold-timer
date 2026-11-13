@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Guide · Timer</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='22' fill='%233b7cf6'/%3E%3Cpath d='M50 22v30l20 12' stroke='white' stroke-width='9' fill='none' stroke-linecap='round'/%3E%3C/svg%3E">
+<style>
+  :root{
+    --bg:#f4f6f9;
+    --panel:#ffffff;
+    --line:#e4e8ee;
+    --line-soft:#f0f3f7;
+    --text:#12161c;
+    --muted:#7b8595;
+    --accent:#3b7cf6;
+    --best:#0e9f6e;
+  }
+  *{box-sizing:border-box}
+  body{
+    margin:0;
+    background:var(--bg);
+    color:var(--text);
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    line-height:1.6;
+    -webkit-font-smoothing:antialiased;
+  }
+  .wrap{max-width:760px;margin:0 auto;padding:32px 20px 64px}
+
+  header{
+    display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;
+    padding-bottom:18px;border-bottom:1px solid var(--line);
+  }
+  .brand{
+    display:flex;align-items:center;gap:9px;
+    font-size:13px;font-weight:650;letter-spacing:.09em;text-transform:uppercase;
+    color:inherit;text-decoration:none;
+  }
+  .brand .dot{width:9px;height:9px;border-radius:50%;background:var(--accent);box-shadow:0 0 0 4px rgba(59,124,246,.14)}
+  .nav{display:flex;gap:4px;flex-wrap:wrap;font-size:13px}
+  .nav a{color:#5c6675;text-decoration:none;padding:6px 10px;border-radius:8px}
+  .nav a:hover{background:#eaeef4;color:var(--text)}
+  .nav a[aria-current="page"]{background:#fff;color:var(--accent);font-weight:600;box-shadow:inset 0 0 0 1px var(--line)}
+
+  h1{font-size:26px;line-height:1.25;letter-spacing:-.01em;margin:30px 0 8px}
+  .lede{margin:0 0 26px;color:var(--muted);font-size:15px;max-width:58ch}
+
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:20px 22px;margin:0 0 16px}
+  .card h2{
+    font-size:11.5px;letter-spacing:.1em;text-transform:uppercase;
+    color:var(--muted);margin:0 0 12px;font-weight:600;
+  }
+  .card p{margin:0 0 10px;font-size:14px;color:#4b5563}
+  .card p:last-child{margin-bottom:0}
+
+  ol.steps{margin:0;padding-left:20px;counter-reset:none}
+  ol.steps li{font-size:14px;color:#4b5563;margin:8px 0}
+  ol.steps li strong{color:var(--text);font-weight:600}
+
+  .kv{
+    display:grid;grid-template-columns:120px 1fr;gap:8px 16px;align-items:baseline;
+    font-size:14px;
+  }
+  .kv dt{color:var(--muted);font-size:12.5px}
+  .kv dd{margin:0;color:#4b5563}
+  .kv dd.mono{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:13px}
+  .kv dd.best{color:var(--best);font-weight:600}
+
+  kbd{
+    font-family:inherit;font-size:12px;
+    background:#fff;color:#3a4351;
+    border:1px solid var(--line);border-bottom-width:2px;
+    border-radius:6px;padding:2px 7px;margin:0 2px;
+  }
+  code{
+    font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:12.5px;
+    background:var(--bg);border:1px solid var(--line);border-radius:6px;padding:1px 6px;
+  }
+
+  footer{
+    margin-top:34px;padding-top:16px;border-top:1px solid var(--line);
+    font-size:12.5px;color:var(--muted);
+  }
+  footer a{color:var(--accent);text-decoration:none}
+  footer a:hover{text-decoration:underline}
+
+  @media (max-width:560px){
+    .wrap{padding:24px 16px 48px}
+    h1{font-size:22px;margin-top:24px}
+    header{gap:12px}
+    .kv{grid-template-columns:1fr;gap:2px}
+    .kv dd{margin-bottom:8px}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header>
+    <a class="brand" href="index.html"><span class="dot"></span>Timer App of Kshithij</a>
+    <nav class="nav" aria-label="Primary">
+      <a href="index.html">Timer</a>
+      <a href="guide.html" aria-current="page">Guide</a>
+      <a href="links.html">Links</a>
+      <a href="contact.html">Contact</a>
+    </nav>
+  </header>
+
+  <h1>Guide</h1>
+  <p class="lede">Three keys, one number, and a list that stays on your device. Here is exactly how it behaves.</p>
+
+  <div class="card">
+    <h2>Start and stop</h2>
+    <ol class="steps">
+      <li><strong>Hold</strong> <kbd>space</kbd>. The display flashes <code>00</code> in a different colour — that means the timer is armed but not yet running.</li>
+      <li><strong>Release</strong> <kbd>space</kbd> to start counting. The digits begin moving immediately.</li>
+      <li><strong>Press any key</strong> to stop. The time is appended to the list on the left.</li>
+    </ol>
+    <p>On a phone or tablet, press and hold anywhere on the timer area instead, and lift your finger to start. Tap again to stop.</p>
+    <p>The hold step exists on purpose: it stops a stray key press from starting a run, and it gives your hands a moment to settle before the clock moves.</p>
+  </div>
+
+  <div class="card">
+    <h2>Reading the numbers</h2>
+    <dl class="kv">
+      <dt>Time</dt>
+      <dd class="mono">0.000</dd>
+      <dt>Average of 5</dt>
+      <dd>Your last five solves, with the fastest and slowest thrown away; the middle three are averaged.</dd>
+      <dt>Average of 12</dt>
+      <dd>The same idea over the last twelve — drop one at each end, average the remaining ten.</dd>
+      <dt>Best time</dt>
+      <dd class="best">The single fastest solve in the whole list, shown in green.</dd>
+    </dl>
+    <p>Dropping the extremes means one lucky or one ruined solve does not drag the average around. Averages appear only once there are enough solves to fill the window.</p>
+  </div>
+
+  <div class="card">
+    <h2>Where your times live</h2>
+    <p>Everything is stored in this browser, on this device, under the key <code>hold-timer.solves.v1</code>. Nothing is uploaded and there is no account, so clearing site data, using a private window, or opening the page from a different address starts you with an empty list.</p>
+    <p><strong>Clear times</strong> at the bottom of the sidebar wipes the list after a confirmation. There is no undo, because there is no copy anywhere else.</p>
+  </div>
+
+  <div class="card">
+    <h2>Small details</h2>
+    <p>The clock is measured with <code>performance.now()</code>, so a system clock adjustment mid-solve does not affect the result. Times are recorded to the millisecond and shown to three decimals; past one minute they switch to <code>m:ss.mmm</code>.</p>
+    <p>Browser shortcuts are left alone — the timer only takes over <kbd>space</kbd> itself, and stops on another key only while a solve is running.</p>
+  </div>
+
+  <footer>
+    Timer App of Kshithij · <a href="index.html">Back to the timer</a>
+  </footer>
+
+</div>
+</body>
+</html>
