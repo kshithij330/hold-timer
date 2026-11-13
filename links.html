@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Links · Timer</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='22' fill='%233b7cf6'/%3E%3Cpath d='M50 22v30l20 12' stroke='white' stroke-width='9' fill='none' stroke-linecap='round'/%3E%3C/svg%3E">
+<style>
+  :root{
+    --bg:#f4f6f9;
+    --panel:#ffffff;
+    --line:#e4e8ee;
+    --line-soft:#f0f3f7;
+    --text:#12161c;
+    --muted:#7b8595;
+    --accent:#3b7cf6;
+  }
+  *{box-sizing:border-box}
+  body{
+    margin:0;
+    background:var(--bg);
+    color:var(--text);
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    line-height:1.6;
+    -webkit-font-smoothing:antialiased;
+  }
+  .wrap{max-width:760px;margin:0 auto;padding:32px 20px 64px}
+
+  header{
+    display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;
+    padding-bottom:18px;border-bottom:1px solid var(--line);
+  }
+  .brand{
+    display:flex;align-items:center;gap:9px;
+    font-size:13px;font-weight:650;letter-spacing:.09em;text-transform:uppercase;
+    color:inherit;text-decoration:none;
+  }
+  .brand .dot{width:9px;height:9px;border-radius:50%;background:var(--accent);box-shadow:0 0 0 4px rgba(59,124,246,.14)}
+  .nav{display:flex;gap:4px;flex-wrap:wrap;font-size:13px}
+  .nav a{color:#5c6675;text-decoration:none;padding:6px 10px;border-radius:8px}
+  .nav a:hover{background:#eaeef4;color:var(--text)}
+  .nav a[aria-current="page"]{background:#fff;color:var(--accent);font-weight:600;box-shadow:inset 0 0 0 1px var(--line)}
+
+  h1{font-size:26px;line-height:1.25;letter-spacing:-.01em;margin:30px 0 8px}
+  .lede{margin:0 0 26px;color:var(--muted);font-size:15px;max-width:58ch}
+
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:20px 22px;margin:0 0 16px}
+  .card h2{
+    font-size:11.5px;letter-spacing:.1em;text-transform:uppercase;
+    color:var(--muted);margin:0 0 4px;font-weight:600;
+  }
+  .card p{margin:8px 0 0;font-size:14px;color:#4b5563}
+  .card p:first-of-type{margin-top:0}
+
+  .row{
+    display:block;text-decoration:none;color:inherit;
+    padding:14px 0;border-bottom:1px solid var(--line-soft);
+  }
+  .row:last-child{border-bottom:0;padding-bottom:0}
+  .row:first-child{padding-top:12px}
+  .row-title{display:block;font-size:14.5px;font-weight:600}
+  .row:hover .row-title{color:var(--accent)}
+  .row-meta{display:block;margin-top:2px;font-size:12px;color:var(--muted);word-break:break-all}
+  .row-desc{display:block;margin-top:5px;font-size:13.5px;color:#5c6675}
+  .row:hover .row-meta{color:#6b7686}
+
+  code{
+    font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:12.5px;
+    background:var(--bg);border:1px solid var(--line);border-radius:6px;padding:1px 6px;
+  }
+
+  footer{
+    margin-top:34px;padding-top:16px;border-top:1px solid var(--line);
+    font-size:12.5px;color:var(--muted);
+  }
+  footer a{color:var(--accent);text-decoration:none}
+  footer a:hover{text-decoration:underline}
+
+  @media (max-width:560px){
+    .wrap{padding:24px 16px 48px}
+    h1{font-size:22px;margin-top:24px}
+    header{gap:12px}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header>
+    <a class="brand" href="index.html"><span class="dot"></span>Timer App of Kshithij</a>
+    <nav class="nav" aria-label="Primary">
+      <a href="index.html">Timer</a>
+      <a href="guide.html">Guide</a>
+      <a href="links.html" aria-current="page">Links</a>
+      <a href="contact.html">Contact</a>
+    </nav>
+  </header>
+
+  <h1>Links</h1>
+  <p class="lede">Everything connected to this project in one place: the source, the live app, and where to report a problem.</p>
+
+  <div class="card">
+    <h2>The project</h2>
+    <a class="row" href="https://github.com/kshithij330/hold-timer">
+      <span class="row-title">Source code</span>
+      <span class="row-meta">github.com/kshithij330/hold-timer</span>
+      <span class="row-desc">The whole repository — commit history, branches and pull requests included.</span>
+    </a>
+    <a class="row" href="https://kshithij330.github.io/hold-timer/">
+      <span class="row-title">Live app</span>
+      <span class="row-meta">kshithij330.github.io/hold-timer</span>
+      <span class="row-desc">Published by GitHub Pages from the <code>main</code> branch.</span>
+    </a>
+    <a class="row" href="https://github.com/kshithij330/hold-timer/issues">
+      <span class="row-title">Issues</span>
+      <span class="row-meta">github.com/kshithij330/hold-timer/issues</span>
+      <span class="row-desc">Bugs, feature requests and questions all start here.</span>
+    </a>
+    <a class="row" href="https://github.com/kshithij330">
+      <span class="row-title">Author</span>
+      <span class="row-meta">github.com/kshithij330</span>
+      <span class="row-desc">Other projects by the person who built this timer.</span>
+    </a>
+  </div>
+
+  <div class="card">
+    <h2>Built with</h2>
+    <p>No build step and no dependencies. <code>index.html</code> is the entire application — markup, styles and JavaScript in a single file, served as-is by GitHub Pages.</p>
+    <p>That keeps the whole thing readable in one sitting, which is also why it is easy to contribute to: there is nothing to install before you can open it.</p>
+  </div>
+
+  <div class="card">
+    <h2>Suggest a link</h2>
+    <p>Found something worth pointing to from this page? Open an issue with the URL and a one-line description, or send a pull request that adds a new <code>.row</code> block to this page.</p>
+    <p>Branch names follow the pattern <code>feat/short-name</code>, so a link addition would be something like <code>feat/add-links-page</code>.</p>
+  </div>
+
+  <footer>
+    Timer App of Kshithij · <a href="index.html">Back to the timer</a>
+  </footer>
+
+</div>
+</body>
+</html>
