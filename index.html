@@ -132,6 +132,42 @@
   .clear:hover{background:#f7f9fc;border-color:#cfd7e3;color:#1d2634}
   .clear:active{transform:translateY(1px)}
 
+  /* ---------- right panel (settings) ---------- */
+  .panel-right{
+    flex:0 0 272px;width:272px;
+    border-right:0;border-left:1px solid var(--line);
+    overflow-y:auto;padding-bottom:12px;
+  }
+  .setting-group{padding-bottom:14px}
+  .group-head{
+    padding:14px 20px 8px;
+    font-size:11px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);
+  }
+  .opt{
+    display:flex;align-items:center;gap:10px;
+    padding:7px 20px;cursor:pointer;
+    font-size:13px;color:#3d4655;line-height:1.35;
+    transition:background .15s;
+  }
+  .opt:hover{background:#f7f9fc}
+  .opt input{
+    -webkit-appearance:none;appearance:none;
+    flex:0 0 auto;margin:0;width:17px;height:17px;
+    display:grid;place-items:center;cursor:pointer;
+    background:#fff;border:1.5px solid #cfd7e3;border-radius:5px;
+    transition:background .15s,border-color .15s;
+  }
+  .opt input:hover{border-color:#b3bfd0}
+  .opt input:checked{background:var(--accent);border-color:var(--accent)}
+  .opt input:checked::after{
+    content:"";width:9px;height:5px;
+    border-left:2px solid #fff;border-bottom:2px solid #fff;
+    transform:rotate(-45deg) translate(1px,-1px);
+  }
+  .opt input:focus-visible{outline:2px solid rgba(59,124,246,.35);outline-offset:2px}
+  .opt .sub{display:block;font-size:11px;color:var(--muted);letter-spacing:.005em}
+  .opt-text{min-width:0}
+
   /* ---------- timer stage ---------- */
   .stage{
     position:relative;flex:1;
@@ -224,6 +260,15 @@
     .times-head{padding:0 18px 8px}
     .times li{padding:7px 18px;grid-template-columns:36px 1fr}
     .panel-foot{padding:10px 18px 12px}
+    .panel-right{
+      flex:0 0 auto;width:100%;height:auto;
+      border-left:0;border-top:1px solid var(--line);
+      overflow:visible;padding-bottom:8px;
+    }
+    .panel-right .brand{padding:14px 18px 6px}
+    .group-head{padding:10px 18px 6px}
+    .opt{padding:6px 18px;font-size:12.5px}
+    .checks{display:grid;grid-template-columns:1fr 1fr;gap:0 8px}
   }
 </style>
 </head>
@@ -265,6 +310,7 @@
       <span class="value best" id="best">—</span>
     </div>
   </div>
+  <div class="stats-wrap" id="stats"></div>
 
   <div class="times-head">
     <span>Times</span>
@@ -283,6 +329,30 @@
   <div class="hint" id="hint">Hold <kbd>space</kbd> &nbsp;·&nbsp; release to start</div>
 </main>
 
+<aside class="panel panel-right">
+  <div class="brand"><span class="dot"></span>Settings</div>
+
+  <div class="setting-group">
+    <div class="group-head">Display</div>
+    <label class="opt">
+      <input type="checkbox" id="opt-ms" checked>
+      <span class="opt-text">Show milliseconds<span class="sub">Turn off for whole seconds</span></span>
+    </label>
+  </div>
+
+  <div class="setting-group">
+    <div class="group-head">Averages on the left</div>
+    <div id="avg-options">
+      <label class="opt"><input type="checkbox" value="5" checked><span class="opt-text">Average of 5</span></label>
+      <label class="opt"><input type="checkbox" value="12" checked><span class="opt-text">Average of 12</span></label>
+      <label class="opt"><input type="checkbox" value="15"><span class="opt-text">Average of 15</span></label>
+      <label class="opt"><input type="checkbox" value="30"><span class="opt-text">Average of 30</span></label>
+      <label class="opt"><input type="checkbox" value="50"><span class="opt-text">Average of 50</span></label>
+      <label class="opt"><input type="checkbox" value="100"><span class="opt-text">Average of 100</span></label>
+    </div>
+  </div>
+</aside>
+
 <script>
 (function () {
   "use strict";
@@ -290,20 +360,24 @@
   var STORE = "hold-timer.sessions.v1";
   var LEGACY = "hold-timer.solves.v1";
   var SESSION_COUNT = 10;
+  var STORE = "hold-timer.solves.v1";
+  var SETTINGS = "hold-timer.settings.v1";
   var timerEl = document.getElementById("timer");
   var hintEl  = document.getElementById("hint");
   var listEl  = document.getElementById("times");
   var countEl = document.getElementById("count");
   var stage   = document.getElementById("stage");
-  var ao5El   = document.getElementById("ao5");
-  var ao12El  = document.getElementById("ao12");
-  var bestEl  = document.getElementById("best");
+  var statsEl = document.getElementById("stats");
 
   var sessions = load();
   var solves = sessions.data[sessions.active];
   var phase = "idle";          // idle | holding | running | stopped
   var startAt = 0;
   var rafId = 0;
+
+  var settings = loadSettings();
+  var showMs = settings.ms;
+  var avgs = settings.avgs;
 
   /* ---------- helpers ---------- */
   function validTime(t) { return typeof t === "number" && isFinite(t) && t >= 0; }
@@ -332,13 +406,41 @@
   function save() {
     try { localStorage.setItem(STORE, JSON.stringify(sessions)); } catch (e) {}
   }
+  function loadSettings() {
+    var fallback = { ms: true, avgs: [5, 12] };
+    try {
+      var raw = JSON.parse(localStorage.getItem(SETTINGS));
+      if (raw && typeof raw === "object") {
+        return {
+          ms: raw.ms !== false,
+          avgs: Array.isArray(raw.avgs)
+            ? raw.avgs.filter(function (n) { return typeof n === "number" && n > 1; })
+            : fallback.avgs
+        };
+      }
+    } catch (e) {}
+    return fallback;
+  }
+  function saveSettings() {
+    try {
+      localStorage.setItem(SETTINGS, JSON.stringify({ ms: showMs, avgs: avgs }));
+    } catch (e) {}
+  }
+  function pad(n) { return n < 10 ? "0" + n : String(n); }
   function fmt(ms) {
     if (ms === null || ms === undefined) return "—";
     var t = Math.max(0, ms);
-    if (t < 60000) return (t / 1000).toFixed(3);
-    var m = Math.floor(t / 60000);
-    var s = (t % 60000) / 1000;
-    return m + ":" + s.toFixed(3).padStart(6, "0");
+    if (showMs) {
+      if (t < 60000) return (t / 1000).toFixed(3);
+      var m = Math.floor(t / 60000);
+      var s = (t % 60000) / 1000;
+      return m + ":" + s.toFixed(3).padStart(6, "0");
+    }
+    var secs = Math.floor(t / 1000);
+    if (secs < 60) return pad(secs);
+    var mins = Math.floor(secs / 60);
+    if (mins < 60) return mins + ":" + pad(secs % 60);
+    return Math.floor(mins / 60) + ":" + pad(mins % 60) + ":" + pad(secs % 60);
   }
   function averageOf(n) {
     if (solves.length < n) return null;
@@ -355,9 +457,15 @@
   /* ---------- rendering ---------- */
   function render() {
     var best = bestTime();
-    ao5El.textContent = fmt(averageOf(5));
-    ao12El.textContent = fmt(averageOf(12));
-    bestEl.textContent = fmt(best);
+    var stats = "";
+    for (var i = 0; i < avgs.length; i++) {
+      stats += '<div class="stat"><span class="label">Average of ' + avgs[i] + '</span>' +
+               '<span class="value">' + fmt(averageOf(avgs[i])) + '</span></div>';
+    }
+    stats += '<div class="stat"><span class="label">Best time</span>' +
+             '<span class="value best">' + fmt(best) + '</span></div>';
+    statsEl.innerHTML = stats;
+
     countEl.textContent = String(solves.length);
 
     if (!solves.length) {
@@ -395,7 +503,7 @@
     phase = solves.length ? "stopped" : "idle";
     timerEl.classList.remove("flash");
     stage.classList.remove("holding");
-    timerEl.textContent = solves.length ? fmt(solves[solves.length - 1]) : "0.000";
+    timerEl.textContent = solves.length ? fmt(solves[solves.length - 1]) : fmt(0);
     hintEl.innerHTML = 'Hold <kbd>space</kbd> &nbsp;·&nbsp; release to start';
   }
 
@@ -404,7 +512,7 @@
     phase = "running";
     timerEl.classList.remove("flash");
     stage.classList.remove("holding");
-    timerEl.textContent = "0.000";
+    timerEl.textContent = fmt(0);
     hintEl.textContent = "Press any key to stop";
     startAt = performance.now();
     rafId = requestAnimationFrame(tick);
@@ -477,7 +585,7 @@
       render();
       if (phase === "stopped") {
         phase = "idle";
-        timerEl.textContent = "0.000";
+        timerEl.textContent = fmt(0);
         hintEl.innerHTML = 'Hold <kbd>space</kbd> &nbsp;·&nbsp; release to start';
       }
     }
@@ -510,6 +618,43 @@
   });
 
   sessionEl.value = sessions.active;
+  /* ---------- settings (right panel) ---------- */
+  var msBox = document.getElementById("opt-ms");
+  var avgBoxes = document.querySelectorAll("#avg-options input");
+
+  function syncSettingsUI() {
+    msBox.checked = showMs;
+    for (var i = 0; i < avgBoxes.length; i++) {
+      avgBoxes[i].checked = avgs.indexOf(Number(avgBoxes[i].value)) !== -1;
+    }
+  }
+  function refreshTimerLabel() {
+    if (phase === "running" || phase === "holding") return;
+    timerEl.textContent = (phase === "stopped" && solves.length)
+      ? fmt(solves[solves.length - 1])
+      : fmt(0);
+  }
+
+  msBox.addEventListener("change", function () {
+    showMs = msBox.checked;
+    saveSettings();
+    render();
+    refreshTimerLabel();
+  });
+
+  for (var b = 0; b < avgBoxes.length; b++) {
+    avgBoxes[b].addEventListener("change", function () {
+      avgs = Array.prototype.slice.call(avgBoxes)
+        .filter(function (box) { return box.checked; })
+        .map(function (box) { return Number(box.value); })
+        .sort(function (x, y) { return x - y; });
+      saveSettings();
+      render();
+    });
+  }
+
+  syncSettingsUI();
+  timerEl.textContent = fmt(0);
   render();
 })();
 </script>
