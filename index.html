@@ -49,6 +49,30 @@
   }
   .brand .dot{width:9px;height:9px;border-radius:50%;background:var(--accent);box-shadow:0 0 0 4px rgba(59,124,246,.14)}
 
+  /* ---------- sessions ---------- */
+  .sessions{
+    display:flex;align-items:center;justify-content:space-between;gap:10px;
+    padding:0 20px 16px;
+  }
+  .sessions-label{
+    font-size:11px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);
+  }
+  .select-wrap{position:relative;flex:0 0 auto}
+  .select-wrap select{
+    -webkit-appearance:none;appearance:none;
+    font:inherit;font-size:12.5px;font-weight:550;color:#3d4655;
+    background:#fff;border:1px solid var(--line);border-radius:9px;
+    padding:7px 28px 7px 11px;
+    font-variant-numeric:tabular-nums;cursor:pointer;
+    transition:background .15s,border-color .15s;
+  }
+  .select-wrap select:hover{background:#f7f9fc;border-color:#cfd7e3}
+  .select-wrap select:focus-visible{outline:2px solid rgba(59,124,246,.35);outline-offset:2px}
+  .select-wrap .chev{
+    position:absolute;right:10px;top:50%;transform:translateY(-52%);
+    font-size:9px;color:var(--muted);pointer-events:none;
+  }
+
   .stats-wrap{padding:0 20px 18px}
   .stat{
     display:flex;align-items:baseline;justify-content:space-between;gap:12px;
@@ -192,6 +216,7 @@
       border-right:0;border-top:1px solid var(--line);
     }
     .brand{padding:16px 18px 12px}
+    .sessions{padding:0 18px 12px}
     .stats-wrap{padding:0 18px 14px;display:grid;grid-template-columns:1fr 1fr 1fr;gap:0 14px}
     .stat{flex-direction:column;align-items:flex-start;gap:3px;padding:6px 0;border-bottom:0}
     .stat .label{font-size:11px}
@@ -206,6 +231,25 @@
 
 <aside class="panel">
   <div class="brand"><span class="dot"></span>Timer App of Kshithij</div>
+
+  <div class="sessions">
+    <label class="sessions-label" for="session">Sessions</label>
+    <div class="select-wrap">
+      <select id="session">
+        <option value="1">Session 1</option>
+        <option value="2">Session 2</option>
+        <option value="3">Session 3</option>
+        <option value="4">Session 4</option>
+        <option value="5">Session 5</option>
+        <option value="6">Session 6</option>
+        <option value="7">Session 7</option>
+        <option value="8">Session 8</option>
+        <option value="9">Session 9</option>
+        <option value="10">Session 10</option>
+      </select>
+      <span class="chev" aria-hidden="true">▾</span>
+    </div>
+  </div>
 
   <div class="stats-wrap">
     <div class="stat">
@@ -243,7 +287,9 @@
 (function () {
   "use strict";
 
-  var STORE = "hold-timer.solves.v1";
+  var STORE = "hold-timer.sessions.v1";
+  var LEGACY = "hold-timer.solves.v1";
+  var SESSION_COUNT = 10;
   var timerEl = document.getElementById("timer");
   var hintEl  = document.getElementById("hint");
   var listEl  = document.getElementById("times");
@@ -253,23 +299,38 @@
   var ao12El  = document.getElementById("ao12");
   var bestEl  = document.getElementById("best");
 
-  var solves = load();
+  var sessions = load();
+  var solves = sessions.data[sessions.active];
   var phase = "idle";          // idle | holding | running | stopped
   var startAt = 0;
   var rafId = 0;
 
   /* ---------- helpers ---------- */
+  function validTime(t) { return typeof t === "number" && isFinite(t) && t >= 0; }
   function load() {
+    var store = { active: "1", data: {} };
+    for (var i = 1; i <= SESSION_COUNT; i++) store.data[String(i)] = [];
+
     try {
       var raw = JSON.parse(localStorage.getItem(STORE));
-      if (Array.isArray(raw)) {
-        return raw.filter(function (t) { return typeof t === "number" && isFinite(t) && t >= 0; });
+      if (raw && typeof raw === "object" && raw.data) {
+        for (var key in store.data) {
+          if (Array.isArray(raw.data[key])) store.data[key] = raw.data[key].filter(validTime);
+        }
+        if (store.data[String(raw.active)]) store.active = String(raw.active);
+        return store;
       }
     } catch (e) {}
-    return [];
+
+    // First run on this version: move the single old solve list into Session 1.
+    try {
+      var legacy = JSON.parse(localStorage.getItem(LEGACY));
+      if (Array.isArray(legacy)) store.data["1"] = legacy.filter(validTime);
+    } catch (e) {}
+    return store;
   }
   function save() {
-    try { localStorage.setItem(STORE, JSON.stringify(solves)); } catch (e) {}
+    try { localStorage.setItem(STORE, JSON.stringify(sessions)); } catch (e) {}
   }
   function fmt(ms) {
     if (ms === null || ms === undefined) return "—";
@@ -422,6 +483,33 @@
     }
   });
 
+  /* ---------- sessions ---------- */
+  var sessionEl = document.getElementById("session");
+
+  function switchSession(key) {
+    if (key === sessions.active || !sessions.data[key]) return;
+    sessions.active = key;
+    solves = sessions.data[key];
+    save();
+
+    cancelAnimationFrame(rafId);
+    timerEl.classList.remove("flash");
+    stage.classList.remove("holding");
+    phase = solves.length ? "stopped" : "idle";
+    timerEl.textContent = solves.length ? fmt(solves[solves.length - 1]) : "0.000";
+    hintEl.innerHTML = 'Hold <kbd>space</kbd> &nbsp;·&nbsp; release to start';
+    render();
+  }
+
+  sessionEl.addEventListener("change", function () {
+    if (phase === "running" || phase === "holding") {
+      sessionEl.value = sessions.active;   // never swap mid-solve
+      return;
+    }
+    switchSession(sessionEl.value);
+  });
+
+  sessionEl.value = sessions.active;
   render();
 })();
 </script>
